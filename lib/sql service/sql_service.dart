@@ -50,6 +50,11 @@ class DatabaseService {
 
     return data.query('daily_attendence');
   }
+
+  deleteTable() async {
+    final data = await db;
+    data.delete('daily_attendence');
+  }
 // var databasesPath = await getDatabasesPath();
 // String path = join(databasesPath, 'daily_attendence.db');
 }
