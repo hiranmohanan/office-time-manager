@@ -23,3 +23,17 @@ class HomePunchIn extends HomeEvent {
 class HomePunchGet extends HomeEvent {
   HomePunchGet();
 }
+
+class HomePunchClickStart extends HomeEvent {
+  final DateTime time;
+  HomePunchClickStart(
+    this.time,
+  );
+}
+
+class HomePunchClickEnd extends HomeEvent {
+  final DateTime time;
+  HomePunchClickEnd(
+    this.time,
+  );
+}

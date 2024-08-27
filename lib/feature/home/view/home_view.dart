@@ -1,6 +1,11 @@
+import 'dart:async';
+
+import 'package:flutter/gestures.dart';
 import 'package:flutter/material.dart';
 import 'package:flutter_bloc/flutter_bloc.dart';
 import 'package:flutter_office_time/constants/sizer/sizer_data.dart';
+import 'package:flutter_office_time/feature/home/bloc/service.dart';
+import 'package:flutter_office_time/feature/home/view/time_clock_view.dart';
 import 'package:flutter_office_time/sql%20service/sql_service.dart';
 import 'package:intl/intl.dart';
 import 'package:sizer/sizer.dart';
@@ -94,14 +99,34 @@ class HomeView extends StatelessWidget {
 //                       );
 //                     });
 //               }),
-          vSizedBox1,
-          const Text('Punch In/Out'),
+          const Text(
+            'Punch In/Out',
+            style: TextStyle(color: Colors.black),
+          ),
           vSizedBox1,
           SizedBox(
             width: 90.w,
             height: vBox3,
             child: ElevatedButton(
-              onPressed: () {},
+              onPressed: () {
+                context
+                    .read<HomeBloc>()
+                    .add(HomePunchClickStart(DateTime.now()));
+              },
+              child: Text(
+                'Punch Out',
+                style: Theme.of(context).textTheme.labelLarge,
+              ),
+            ),
+          ),
+          vSizedBox1,
+          SizedBox(
+            width: 90.w,
+            height: vBox3,
+            child: ElevatedButton(
+              onPressed: () {
+                context.read<HomeBloc>().add(HomePunchClickEnd(DateTime.now()));
+              },
               child: Text(
                 'Punch In',
                 style: Theme.of(context).textTheme.labelLarge,
@@ -109,17 +134,8 @@ class HomeView extends StatelessWidget {
             ),
           ),
           vSizedBox1,
-          SizedBox(
-            width: 90.w,
-            height: vBox3,
-            child: ElevatedButton(
-              onPressed: () {},
-              child: Text(
-                'Punch Out',
-                style: Theme.of(context).textTheme.labelLarge,
-              ),
-            ),
-          ),
+          const ClockScreen(),
+
           vSizedBox1,
           BlocBuilder<HomeBloc, HomeState>(
             builder: (context, state) {
@@ -171,30 +187,55 @@ class HomeView extends StatelessWidget {
                           );
                         }),
                     vSizedBox1,
-                    GridView.builder(
-                      gridDelegate:
-                          const SliverGridDelegateWithFixedCrossAxisCount(
-                              crossAxisCount: 2),
+                    ListView.separated(
+                      padding: const EdgeInsets.all(10),
+                      separatorBuilder: (context, index) {
+                        if (punchData[index]['date'] !=
+                            punchData[index + 1]['date']) {
+                          return Container(
+                            padding: const EdgeInsets.all(20),
+                            margin: const EdgeInsets.symmetric(vertical: 5),
+                            decoration: BoxDecoration(
+                              color: Colors.blue,
+                              borderRadius: BorderRadius.circular(10),
+                            ),
+                            child: Row(
+                              children: [
+                                Text(
+                                  punchData[index]['date'],
+                                  style: Theme.of(context).textTheme.bodyLarge,
+                                ),
+                                const Spacer(),
+                                Text(
+                                  ' Total minutes: ',
+                                  style: Theme.of(context).textTheme.bodyLarge,
+                                ),
+                              ],
+                            ),
+                          );
+                        }
+                        return const SizedBox(
+                          height: 5,
+                        );
+                      },
                       shrinkWrap: true,
                       physics: const NeverScrollableScrollPhysics(),
                       itemCount: state.punch.length,
                       itemBuilder: (context, index) {
                         final List<Map<String, dynamic>> punchData =
                             state.punch;
-                        return Card(
-                          margin: const EdgeInsets.all(10),
-                          color: Colors.grey,
-                          child: Column(
-                            crossAxisAlignment: CrossAxisAlignment.center,
-                            mainAxisAlignment: MainAxisAlignment.center,
-                            children: [
-                              Text('Date: ${punchData[index]['date']}'),
-                              Text('Punch In: ${punchData[index]['punch_in']}'),
-                              Text(
-                                  'Punch Out: ${punchData[index]['punch_out']}'),
-                              Text('Time: ${punchData[index]['time']}'),
-                            ],
+                        return ListTile(
+                          style: ListTileStyle.drawer,
+                          contentPadding: const EdgeInsets.all(8),
+                          shape: RoundedRectangleBorder(
+                            borderRadius: BorderRadius.circular(10),
+                            side: const BorderSide(color: Colors.blue),
                           ),
+                          leading: const Icon(Icons.access_time),
+                          title: Text('Time: ${punchData[index]['time']}'),
+                          subtitle: Text(
+                              'Punch Out: ${punchData[index]['punch_out']} '
+                              'Punch In: ${punchData[index]['punch_in']}'),
                         );
                       },
                     ),

@@ -13,6 +13,8 @@ class HomeBloc extends Bloc<HomeEvent, HomeState> {
   HomeBloc() : super(HomeInitial()) {
     on<HomePunchIn>(_init);
     on<HomePunchGet>(_getPunch);
+    on<HomePunchClickStart>(_punchClickstart);
+    on<HomePunchClickEnd>(_punchclickEnd);
   }
   Future<void> _init(
     HomePunchIn event,
@@ -58,6 +60,24 @@ class HomeBloc extends Bloc<HomeEvent, HomeState> {
 
       emit(HomePunch(punch));
     } on Exception catch (e) {
+      emit(HomeError(e.toString()));
+    }
+  }
+
+  Future<void> _punchClickstart(
+      HomePunchClickStart event, Emitter<HomeState> emit) async {
+    try {
+      emit(Punchclicking(DateTime.now().difference(event.time)));
+    } catch (e) {
+      emit(HomeError(e.toString()));
+    }
+  }
+
+  Future<void> _punchclickEnd(
+      HomePunchClickEnd event, Emitter<HomeState> emit) async {
+    try {
+      emit(PunchClicked(DateTime.now().difference(event.time)));
+    } catch (e) {
       emit(HomeError(e.toString()));
     }
   }
